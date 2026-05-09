@@ -71,3 +71,85 @@ export const addMovie = async (req, res) => {
             .json({ error: "An error occurred while adding the movie" });
     }
 };
+
+// Update Movie
+export const updateMovie = async (req, res) => {
+    const { id } = req.params;
+    const { title, overview, releaseYear, genres, runtime, posterUrl } =
+        req.body;
+
+    try {
+        const existingMovie = await prisma.movie.findUnique({
+            where: { id },
+        });
+
+        if (!existingMovie) {
+            return res.status(404).json({ error: "Movie not found" });
+        }
+
+        if (existingMovie.createdBy !== req.user.id) {
+            return res
+                .status(403)
+                .json({ error: "You are not authorized to update this movie" });
+        }
+
+        const updatedMovie = await prisma.movie.update({
+            where: { id },
+            data: {
+                title,
+                overview,
+                releaseYear,
+                genres,
+                runtime,
+                posterUrl,
+            },
+        });
+
+        res.status(200).json({
+            status: "success",
+            data: {
+                movie: updatedMovie,
+            },
+        });
+    } catch (error) {
+        return res
+            .status(500)
+            .json({ error: "An error occurred while updating the movie" });
+    }
+};
+
+// Delete Movie
+export const deleteMovie = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const existingMovie = await prisma.movie.findUnique({
+            where: { id },
+        });
+
+        if (!existingMovie) {
+            return res.status(404).json({ error: "Movie not found" });
+        }
+
+        if (existingMovie.createdBy !== req.user.id) {
+            return res
+                .status(403)
+                .json({ error: "You are not authorized to delete this movie" });
+        }
+
+        await prisma.movie.delete({
+            where: { id },
+        });
+
+        res.status(200).json({
+            data: {
+                status: "success",
+                message: "Movie deleted successfully",
+            },
+        });
+    } catch (error) {
+        return res
+            .status(500)
+            .json({ error: "An error occurred while deleting the movie" });
+    }
+};
