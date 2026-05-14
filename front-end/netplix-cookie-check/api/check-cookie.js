@@ -9,46 +9,81 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    // Only accept POST requests
+    // Only allow POST
     if (req.method !== "POST") {
-        return res.status(405).json({ message: "Method Not Allowed" });
-    }
-
-    const { cookie } = req.body;
-
-    if (!cookie) {
-        return res.status(400).json({ message: "Cookie is required" });
-    }
-
-    // Validate API key exists
-    if (!process.env.NETFLIX_API_KEY) {
-        console.error("NETFLIX_API_KEY not set in environment");
-        return res.status(500).json({ message: "Server configuration error" });
+        return res.status(405).json({
+            message: "Method Not Allowed",
+        });
     }
 
     try {
+        const { cookie } = req.body;
+
+        // Validate cookie
+        if (!cookie) {
+            return res.status(400).json({
+                message: "Cookie is required",
+            });
+        }
+
+        // Validate API key
+        if (!process.env.NETFLIX_API_KEY) {
+            console.error("NETFLIX_API_KEY is missing");
+
+            return res.status(500).json({
+                message: "Server configuration error",
+            });
+        }
+
+        console.log("API KEY EXISTS:", !!process.env.NETFLIX_API_KEY);
+
+        // Send request to external API
         const response = await fetch("https://nftoken.site/v1/api.php", {
             method: "POST",
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
+                "Content-Type": "application/json",
             },
-            body: new URLSearchParams({
-                key: process.env.NETFLIX_API_KEY,
-                cookie: cookie,
+            body: JSON.stringify({
+                key: process.env.NETFLIX_API_KEY.trim(),
+                cookie: cookie.trim(),
             }),
         });
 
-        const data = await response.json();
+        // Read raw response first for debugging
+        const rawText = await response.text();
 
-        if (!response.ok) {
-            return res
-                .status(response.status)
-                .json(data || { message: "API Error" });
+        console.log("EXTERNAL API STATUS:", response.status);
+        console.log("EXTERNAL API RESPONSE:", rawText);
+
+        // Try parsing JSON safely
+        let data;
+
+        try {
+            data = JSON.parse(rawText);
+        } catch {
+            data = {
+                raw: rawText,
+            };
         }
 
+        // Return external API errors directly
+        if (!response.ok) {
+            return res.status(response.status).json({
+                success: false,
+                externalStatus: response.status,
+                data,
+            });
+        }
+
+        // Success
         return res.status(200).json(data);
     } catch (error) {
-        console.error("API Error:", error.message);
-        return res.status(500).json({ message: "Internal Server Error" });
+        console.error("SERVER ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message,
+        });
     }
 }
