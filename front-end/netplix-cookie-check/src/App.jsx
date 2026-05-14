@@ -8,7 +8,7 @@ import Generate from "./pages/Generate";
 import Maintenance from "./pages/Maintenance";
 
 function App() {
-    const [isUnderMaintenance] = useState(true); // Set to true to show maintenance page
+    const [isUnderMaintenance] = useState(false); // Set to true to show maintenance page
 
     return (
         <>
