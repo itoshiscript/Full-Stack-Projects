@@ -135,9 +135,9 @@ const Generate = () => {
 
             <div className="content-wrapper">
                 <div className="header">
-                    <h1 className="header-title">Netflix Cookies Gen</h1>
+                    <h1 className="header-title">Netflix Cookie Checker</h1>
                     <p className="header-subtitle">
-                        Generate fresh cookies for your Netflix accounts
+                        Checks for active netflix cookies
                     </p>
                 </div>
 
