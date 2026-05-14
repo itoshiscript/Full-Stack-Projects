@@ -13,7 +13,7 @@ const Generate = () => {
     const checkSingleCookie = async (cookieValue) => {
         const apiUrl =
             import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-        const res = await axios.post(`${apiUrl}`, {
+        const res = await axios.post(`${apiUrl}/check-cookie`, {
             cookie: cookieValue,
         });
         return res.data;
