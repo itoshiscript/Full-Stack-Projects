@@ -8,8 +8,8 @@ const Maintenance = () => {
                 <div className="maintenance-icon">🔧</div>
                 <h1 className="maintenance-title">Website Under Maintenance</h1>
                 <p className="maintenance-text">
-                    We're currently performing scheduled maintenance to improve
-                    your experience.
+                    We're currently performing maintenance to improve the
+                    checker performance.
                 </p>
                 <p className="maintenance-subtitle">
                     We'll be back online shortly. Thank you for your patience!
