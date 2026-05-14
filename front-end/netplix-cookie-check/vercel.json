@@ -6,5 +6,7 @@
             "runtime": "nodejs20.x"
         }
     },
-    "env": ["NETFLIX_API_KEY"]
+    "env": {
+        "NETFLIX_API_KEY": "Netflix API Key for secure cookie validation"
+    }
 }
