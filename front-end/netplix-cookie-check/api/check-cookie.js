@@ -45,7 +45,7 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
                 key: process.env.NETFLIX_API_KEY,
-                cookie: cookie.trim(),
+                cookie: cookie,
             }),
         });
 
