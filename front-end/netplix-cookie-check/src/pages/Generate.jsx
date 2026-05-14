@@ -11,8 +11,9 @@ const Generate = () => {
     const [isBulkMode, setIsBulkMode] = useState(false);
 
     const checkSingleCookie = async (cookieValue) => {
-        const res = await axios.post("https://nftoken.site/v1/api.php", {
-            key: import.meta.env.VITE_NETFLIX_KEY,
+        const apiUrl =
+            import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+        const res = await axios.post(`${apiUrl}/check-cookie`, {
             cookie: cookieValue,
         });
         return res.data;
