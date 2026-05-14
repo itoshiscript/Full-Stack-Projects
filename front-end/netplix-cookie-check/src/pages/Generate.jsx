@@ -95,6 +95,7 @@ const Generate = () => {
             );
         } finally {
             setLoading(false);
+            setCookie(""); // Clear textarea
         }
     };
 

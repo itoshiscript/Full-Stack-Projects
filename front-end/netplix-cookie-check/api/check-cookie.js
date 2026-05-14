@@ -33,6 +33,9 @@ export default async function handler(req, res) {
     try {
         rateLimit.set(key, usedToday + 1);
 
+        // Log API key existence
+        console.log("API KEY EXISTS:", !!process.env.NETFLIX_API_KEY);
+
         const response = await fetch("https://nftoken.site/v1/api.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -42,7 +45,12 @@ export default async function handler(req, res) {
             }),
         });
 
+        // Log external API status and response
+        console.log("EXTERNAL API STATUS:", response.status);
+
         const data = await response.json();
+        console.log("EXTERNAL API RESPONSE:", JSON.stringify(data));
+
         if (!response.ok) {
             return res
                 .status(response.status)
