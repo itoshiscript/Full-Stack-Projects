@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Analytics } from "@vercel/analytics/next";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "./assets/vite.svg";
 import heroImg from "./assets/hero.png";
@@ -11,6 +12,7 @@ function App() {
     return (
         <>
             <Generate />
+            <Analytics />
         </>
     );
 }
