@@ -313,6 +313,17 @@ const Generate = () => {
 
                         {!isDead && (
                             <div className="status-card-buttons">
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(cookie);
+                                        alert("Cookie copied!");
+                                    }}
+                                    className="btn-large"
+                                    style={{ backgroundColor: "#4CAF50" }}
+                                >
+                                    📋 Copy Cookie
+                                </button>
+
                                 {responseData.x_l1 && (
                                     <a
                                         href={responseData.x_l1}
