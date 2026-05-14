@@ -1,7 +1,4 @@
 {
     "buildCommand": "npm run build",
-    "outputDirectory": "dist",
-    "env": {
-        "NETFLIX_API_KEY": "Netflix API Key for secure cookie validation"
-    }
+    "outputDirectory": "dist"
 }
