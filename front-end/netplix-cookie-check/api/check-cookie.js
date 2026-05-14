@@ -1,89 +1,57 @@
+const rateLimit = new Map();
+
 export default async function handler(req, res) {
-    // Enable CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    // Handle preflight request
     if (req.method === "OPTIONS") {
         return res.status(200).end();
     }
 
-    // Only allow POST
     if (req.method !== "POST") {
-        return res.status(405).json({
-            message: "Method Not Allowed",
+        return res.status(405).json({ message: "Method Not Allowed" });
+    }
+
+    const { cookie } = req.body;
+    const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    const today = new Date().toDateString();
+    const key = `${clientIp}-${today}`;
+
+    // Check daily limit (100 cookies per day)
+    const usedToday = rateLimit.get(key) || 0;
+    if (usedToday >= 100) {
+        return res.status(429).json({
+            message: "Daily limit reached. Max 100 cookies per day.",
         });
     }
 
+    if (!cookie) {
+        return res.status(400).json({ message: "Cookie is required" });
+    }
+
     try {
-        const { cookie } = req.body;
+        rateLimit.set(key, usedToday + 1);
 
-        // Validate cookie
-        if (!cookie) {
-            return res.status(400).json({
-                message: "Cookie is required",
-            });
-        }
-
-        // Validate API key
-        if (!process.env.NETFLIX_API_KEY) {
-            console.error("NETFLIX_API_KEY is missing");
-
-            return res.status(500).json({
-                message: "Server configuration error",
-            });
-        }
-
-        console.log("API KEY EXISTS:", !!process.env.NETFLIX_API_KEY);
-
-        // Send request to external API
         const response = await fetch("https://nftoken.site/v1/api.php", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 key: process.env.NETFLIX_API_KEY,
                 cookie: cookie,
             }),
         });
 
-        // Read raw response first for debugging
-        const rawText = await response.text();
-
-        console.log("EXTERNAL API STATUS:", response.status);
-        console.log("EXTERNAL API RESPONSE:", rawText);
-
-        // Try parsing JSON safely
-        let data;
-
-        try {
-            data = JSON.parse(rawText);
-        } catch {
-            data = {
-                raw: rawText,
-            };
-        }
-
-        // Return external API errors directly
+        const data = await response.json();
         if (!response.ok) {
-            return res.status(response.status).json({
-                success: false,
-                externalStatus: response.status,
-                data,
-            });
+            return res
+                .status(response.status)
+                .json(data || { message: "API Error" });
         }
 
-        // Success
         return res.status(200).json(data);
     } catch (error) {
-        console.error("SERVER ERROR:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error",
-            error: error.message,
-        });
+        console.error("API Error:", error.message);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 }
