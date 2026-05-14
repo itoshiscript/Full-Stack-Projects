@@ -1,11 +1,6 @@
 {
     "buildCommand": "npm run build",
     "outputDirectory": "dist",
-    "functions": {
-        "api/**/*.js": {
-            "runtime": "nodejs20.x"
-        }
-    },
     "env": {
         "NETFLIX_API_KEY": "Netflix API Key for secure cookie validation"
     }
