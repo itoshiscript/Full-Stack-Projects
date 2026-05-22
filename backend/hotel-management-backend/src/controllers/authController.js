@@ -105,3 +105,17 @@ export const login = async (req, res) => {
         });
     }
 };
+
+export const logout = (req, res) => {
+    res.cookie("jwt", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        expires: new Date(0),
+    });
+
+    res.status(200).json({
+        status: "success",
+        message: "Logged out successfully",
+    });
+};

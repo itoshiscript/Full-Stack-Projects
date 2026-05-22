@@ -39,27 +39,53 @@ export const createRoomModel = async (
     return result;
 };
 
-export const updateRoomModel = async (
-    roomId,
-    roomNumber,
-    roomType,
-    price,
-    capacity,
-    description,
-    image,
-) => {
-    const query =
-        "UPDATE rooms SET room_number = ?, room_type = ?, price = ?, capacity = ?, description = ?, image = ? WHERE id = ?";
+export const updateRoomModel = async (roomId, data) => {
+    const fields = [];
+    const values = [];
 
-    const [result] = await conn.execute(query, [
-        roomNumber,
-        roomType,
-        price,
-        capacity,
-        description,
-        image,
-        roomId,
-    ]);
+    if (data.roomNumber !== undefined) {
+        fields.push("room_number = ?");
+        values.push(data.roomNumber);
+    }
+
+    if (data.roomType !== undefined) {
+        fields.push("room_type = ?");
+        values.push(data.roomType);
+    }
+
+    if (data.price !== undefined) {
+        fields.push("price = ?");
+        values.push(data.price);
+    }
+
+    if (data.capacity !== undefined) {
+        fields.push("capacity = ?");
+        values.push(data.capacity);
+    }
+
+    if (data.description !== undefined) {
+        fields.push("description = ?");
+        values.push(data.description);
+    }
+
+    if (data.image !== undefined) {
+        fields.push("image = ?");
+        values.push(data.image);
+    }
+
+    if (fields.length === 0) {
+        throw new Error("No fields to update");
+    }
+
+    values.push(roomId);
+
+    const query = `
+        UPDATE rooms
+        SET ${fields.join(", ")}
+        WHERE id = ?
+    `;
+
+    const [result] = await conn.execute(query, values);
 
     return result;
 };

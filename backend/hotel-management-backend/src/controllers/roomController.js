@@ -2,6 +2,8 @@ import {
     getAllRoomsModel,
     getRoomByIdModel,
     createRoomModel,
+    updateRoomModel,
+    deleteRoomModel,
 } from "../models/roomModel.js";
 
 export const getAllRooms = async (req, res) => {
@@ -83,6 +85,70 @@ export const createRoom = async (req, res) => {
             data: {
                 status: "error",
                 message: "An error occurred while creating the room.",
+            },
+        });
+    }
+};
+
+export const updateRoom = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await updateRoomModel(id, req.body);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                data: {
+                    status: "error",
+                    message: "Room not found.",
+                },
+            });
+        }
+
+        return res.status(200).json({
+            data: {
+                status: "success",
+                message: "Room updated successfully.",
+            },
+        });
+    } catch (err) {
+        console.error(err);
+
+        return res.status(500).json({
+            data: {
+                status: "error",
+                message: err.message,
+            },
+        });
+    }
+};
+
+export const deleteRoom = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await deleteRoomModel(id);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                data: {
+                    status: "error",
+                    message: "Room not found.",
+                },
+            });
+        }
+        return res.status(200).json({
+            data: {
+                status: "success",
+                message: "Room deleted successfully.",
+            },
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            data: {
+                status: "error",
+                message: err.message,
             },
         });
     }
