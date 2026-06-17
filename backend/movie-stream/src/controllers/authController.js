@@ -103,3 +103,4 @@ export const logout = (req, res) => {
         message: "Logged out successfully",
     });
 };
+
