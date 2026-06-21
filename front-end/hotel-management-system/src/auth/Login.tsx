@@ -1,13 +1,57 @@
 import {Link} from "react-router-dom";
 import {type SyntheticEvent, useState} from "react";
+import {useMutation} from "@tanstack/react-query";
+
+interface LoginUser {
+    email: string;
+    password: string;
+}
+
+interface UserResponse {
+    token: string;
+}
 
 export const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const login = async (user: LoginUser): Promise<UserResponse> => {
+        const response = await fetch('http://localhost:3000/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(user),
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.errors || data.message || 'Failed to Login')
+        }
+
+        return data.data ?? data;
+    }
+
+    const {mutate, isError, error, isPending} = useMutation({
+        mutationKey: ["login"],
+        mutationFn: login,
+        onSuccess: (data) => {
+            console.log(data.token);
+            setEmail("");
+            setPassword("");
+        }
+    })
+
+
     const handleSubmit = (e: SyntheticEvent) => {
         e.preventDefault();
-        // TODO: handle login
+        mutate({
+            email,
+            password,
+        })
+
     };
 
     return (
@@ -28,6 +72,11 @@ export const Login = () => {
                 </div>
 
                 {/* Form Card */}
+                {isError && (
+                    <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                        {error.message}
+                    </div>
+                )}
                 <div className="mt-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         {/* Email */}
@@ -73,7 +122,7 @@ export const Login = () => {
                             type="submit"
                             className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-md bg-gray-900 text-sm font-medium text-white shadow-sm transition-colors hover:bg-gray-800"
                         >
-                            Sign In
+                            {isPending ? 'Logging in...' : 'Sign in'}
                         </button>
                     </form>
 

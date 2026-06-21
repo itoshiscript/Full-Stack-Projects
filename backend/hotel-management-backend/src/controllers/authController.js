@@ -1,6 +1,6 @@
-import { findUserByEmail, registerUser } from "../models/authModel.js";
+import {findUserByEmail, registerUser} from "../models/authModel.js";
 import bcrypt from "bcryptjs";
-import { generateToken } from "../utils/generateToken.js";
+import {generateToken} from "../utils/generateToken.js";
 
 export const register = async (req, res) => {
     try {
@@ -17,7 +17,7 @@ export const register = async (req, res) => {
         const existingUser = await findUserByEmail(email);
 
         if (existingUser) {
-            return res.status(400).json({ message: "Email already in use" });
+            return res.status(400).json({message: "Email already in use"});
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -63,12 +63,12 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const {email, password} = req.body;
 
         if (!email || !password) {
             return res
                 .status(400)
-                .json({ message: "Please provide email and password" });
+                .json({message: "Please provide email and password"});
         }
 
         const user = await findUserByEmail(email);
@@ -76,7 +76,7 @@ export const login = async (req, res) => {
         if (!user) {
             return res
                 .status(400)
-                .json({ message: "Invalid email or password" });
+                .json({message: "Invalid email or password"});
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -84,7 +84,7 @@ export const login = async (req, res) => {
         if (!isMatch) {
             return res
                 .status(400)
-                .json({ message: "Invalid email or password" });
+                .json({message: "Invalid email or password"});
         }
 
         const token = generateToken(user.id, res);
@@ -110,7 +110,7 @@ export const logout = (req, res) => {
     res.cookie("jwt", "", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         expires: new Date(0),
     });
 

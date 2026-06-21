@@ -1,5 +1,18 @@
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {type SyntheticEvent, useState} from "react";
+import {useMutation} from "@tanstack/react-query";
+
+
+interface User {
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    email: string;
+    password: string;
+    phone: string;
+    address: string;
+}
+
 
 export const Register = () => {
     const [firstName, setFirstName] = useState("");
@@ -10,9 +23,48 @@ export const Register = () => {
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
 
+    const navigate = useNavigate();
+
+    const register = async (newUser: User) => {
+        const response = await fetch('http://localhost:3000/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(newUser),
+        })
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.errors || data.message || 'Failed to register');
+        }
+        return data;
+    }
+
+
+    const {mutate, isError, error, isPending} = useMutation({
+        mutationKey: ['register'],
+        mutationFn: register,
+        onSuccess: () => {
+            navigate('/')
+        }
+
+    });
+
+
     const handleSubmit = (e: SyntheticEvent) => {
         e.preventDefault();
-        // TODO: handle registration
+        mutate({
+            firstName,
+            middleName,
+            lastName,
+            email,
+            password,
+            phone,
+            address,
+        });
     };
 
     return (
@@ -34,6 +86,11 @@ export const Register = () => {
 
                 {/* Form Card */}
                 <div className="mt-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                    {isError && (
+                        <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                            {error.message}
+                        </div>
+                    )}
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         {/* Name Row */}
                         <div className="grid grid-cols-2 gap-4">
@@ -112,6 +169,9 @@ export const Register = () => {
                                 className="h-10 rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors"
                                 required
                             />
+                            <p className="text-xs text-gray-400">
+                                Min 8 characters, uppercase, lowercase, number, and special character (@$!%*?&)
+                            </p>
                         </div>
 
                         {/* Phone */}
@@ -150,8 +210,9 @@ export const Register = () => {
                         <button
                             type="submit"
                             className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-md bg-gray-900 text-sm font-medium text-white shadow-sm transition-colors hover:bg-gray-800"
+                            disabled={isPending}
                         >
-                            Create Account
+                            {isPending ? 'Registering...' : 'Register'}
                         </button>
                     </form>
 

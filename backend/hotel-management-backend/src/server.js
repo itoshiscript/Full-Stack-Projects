@@ -1,7 +1,7 @@
 import express from "express";
 import authRoutes from "./routes/authRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js";
-import { disconnectDB } from "./database/config.js";
+import {disconnectDB} from "./database/config.js";
 import dotenv from "dotenv";
 import cors from "cors";
 
@@ -10,9 +10,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+}));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 
 app.use("/auth", authRoutes);
 app.use("/rooms", roomRoutes);
