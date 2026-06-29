@@ -1,0 +1,13 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="GrazieInspection" enabled="false" level="GRAMMAR_ERROR" enabled_by_default="false" />
+    <inspection_tool class="GrazieStyle" enabled="false" level="GRAMMAR_ERROR" enabled_by_default="false" editorAttributes="GRAMMAR_ERROR" />
+    <inspection_tool class="LanguageDetectionInspection" enabled="false" level="GRAMMAR_ERROR" enabled_by_default="false" editorAttributes="GRAMMAR_ERROR" />
+    <inspection_tool class="SpellCheckingInspection" enabled="false" level="GRAMMAR_ERROR" enabled_by_default="false" editorAttributes="GRAMMAR_ERROR">
+      <option name="processCode" value="true" />
+      <option name="processLiterals" value="true" />
+      <option name="processComments" value="true" />
+    </inspection_tool>
+  </profile>
+</component>
